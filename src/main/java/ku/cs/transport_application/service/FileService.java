@@ -39,18 +39,29 @@ public class FileService {
         String fileName = file.getOriginalFilename();
         assert fileName != null;
 
-        Files.createDirectories(Paths.get(uploadDir));
+        // ป้องกัน path traversal
+        if (fileName.contains("..")) {
+            throw new IllegalArgumentException("Invalid file name containing path traversal");
+        }
+
+        Path dir = Paths.get(uploadDir);
+        Files.createDirectories(dir);
 
         fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
 
         File uploadedFile = new File(uploadDir + fileName);
-        Path path = Paths.get(uploadDir, fileName);
+        Path path = Paths.get(uploadDir, fileName).normalize();
+
+        if (!path.startsWith(dir.toAbsolutePath().normalize())) {
+            throw new IllegalArgumentException("Invalid file name");
+        }
+
         Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
 
         Order order = orderRepository.findById(orderID)
                 .orElseThrow(() -> new IllegalArgumentException("Order not found"));
 
-        order.setShipmentDocDir(String.valueOf(path));
+        order.setShipmentDocDir(path.toString());
         orderRepository.save(order);
     }
 
@@ -95,15 +106,25 @@ public class FileService {
                 break;
         }
 
-        Files.createDirectories(Paths.get(uploadDir));
+        Path dir = Paths.get(uploadDir);
+        Files.createDirectories(dir);
 
         String fileName = file.getOriginalFilename();
         assert fileName != null;
 
+        if (fileName.contains("..")) {
+            throw new IllegalArgumentException("Invalid file name containing path traversal");
+        }
+
         String fileExtension = fileName.substring(fileName.lastIndexOf("."));
         newFileName = UUID.randomUUID() + fileExtension;
 
-        Path path = Paths.get(uploadDir, newFileName);
+        Path path = Paths.get(uploadDir, newFileName).normalize();
+
+        if (!path.startsWith(dir.toAbsolutePath().normalize())) {
+            throw new IllegalArgumentException("Invalid file path");
+        }
+
         Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
 
         String fileUrl = "/images/" + entityName + "/" + newFileName;
