@@ -66,6 +66,9 @@ public class UpdateProfileTest {
                 "image content".getBytes());
     }
 
+    /**
+     * ✅ Acceptance criteria 1. ผู้ใช้สามารถแก้ไขข้อมูลโปรไฟล์ได้
+     */
     @Test
     public void testUserCanEditProfile() throws Exception {
         String editProfileJson = objectMapper.writeValueAsString(editProfileRequest);
@@ -93,6 +96,9 @@ public class UpdateProfileTest {
         verify(userService, times(1)).setUser(existingUser);
     }
 
+    /**
+     * ✅ Acceptance criteria 2. มีการตรวจสอบข้อมูลใหม่ว่าถูกต้องตามหลักที่เคย set ไว้ก่อนสมัครสมาชิกหรือปล่าว
+     */
     @Test
     public void testProfileUpdateValidation() throws Exception {
         String editProfileJson = objectMapper.writeValueAsString(editProfileRequest);
@@ -120,6 +126,9 @@ public class UpdateProfileTest {
         verify(userService, never()).setUser(any(User.class));
     }
 
+    /**
+     * ✅ Acceptance criteria 3. ระบบสามารถแสดงข้อมูลโปรไฟล์ได้อย่างถูกต้อง หลังจากทำการแก้ไขข้อมูลโปรไฟล์แล้ว
+     */
     @Test
     public void testProfileDisplayAfterUpdate() throws Exception {
         String editProfileJson = objectMapper.writeValueAsString(editProfileRequest);
