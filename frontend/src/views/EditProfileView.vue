@@ -178,9 +178,11 @@ export default {
       if (!this.validateForm()) return;
       try {
         const formData = new FormData();
-        formData.append("name", this.profile.name);
-        formData.append("email", this.profile.email);
-        formData.append("phoneNumber", this.profile.phoneNumber);
+        formData.append("editProfileRequest", JSON.stringify({
+          name: this.profile.name,
+          email: this.profile.email,
+          phoneNumber: this.profile.phoneNumber
+        }));
 
         if (this.selectedProfilePicture) {
           formData.append("profilePicture", this.selectedProfilePicture);

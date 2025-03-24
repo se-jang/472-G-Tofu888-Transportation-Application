@@ -5,7 +5,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
-import org.springframework.web.multipart.MultipartFile;
 
 @Data
 public class EditProfileRequest {
@@ -21,7 +20,5 @@ public class EditProfileRequest {
     @NotBlank(message = "Phone Number is required")
     @Pattern(regexp = "^[0-9]*$", message = "Phone number must be numeric")
     @Size(min = 10, max = 10, message = "Phone number must be exactly 10 digits")
-    public String phone;
-
-    public MultipartFile profilePicture;
+    public String phoneNumber;
 }

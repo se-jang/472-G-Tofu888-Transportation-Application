@@ -1,5 +1,6 @@
 package ku.cs.transport_application.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
 import ku.cs.transport_application.common.OrderStatus;
 import ku.cs.transport_application.common.UserRole;
@@ -15,6 +16,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.DataInput;
 import java.io.IOException;
 import java.util.Map;
 import java.util.UUID;
@@ -48,8 +50,13 @@ public class UserController {
 
     @PutMapping("/users/update-profile/{userId}")
     public ResponseEntity<?> updateUserProfile(@PathVariable("userId") UUID userId,
-                                               @Valid @RequestBody EditProfileRequest editProfileRequest,
-                                               BindingResult result) {
+                                               @Valid @RequestPart("editProfileRequest") String editProfileRequestStr,
+                                               @RequestPart(value = "profilePicture", required = false) MultipartFile profilePicture,
+                                               BindingResult result) throws IOException {
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        EditProfileRequest editProfileRequest = objectMapper.readValue(editProfileRequestStr, EditProfileRequest.class);
+
         if (result.hasErrors()) {
             return new ResponseEntity<>(result.getAllErrors(), HttpStatus.BAD_REQUEST);
         }
@@ -57,11 +64,11 @@ public class UserController {
         User record = userService.findById(userId);
         record.setName(editProfileRequest.getName());
         record.setEmail(editProfileRequest.getEmail());
-        record.setPhoneNumber(editProfileRequest.getPhone());
+        record.setPhoneNumber(editProfileRequest.getPhoneNumber());
 
-        if (editProfileRequest.getProfilePicture() != null) {
+        if (profilePicture != null) {
             try {
-                fileService.uploadProfilePicture(userId, editProfileRequest.getProfilePicture() , record.getRole() == UserRole.USER ? UserRole.ADMIN : UserRole.USER);
+                fileService.uploadProfilePicture(userId, profilePicture, record.getRole() == UserRole.USER ? UserRole.ADMIN : UserRole.USER);
             } catch (IOException e) {
                 return new ResponseEntity<>(Map.of("error", "Failed to upload profile picture"), HttpStatus.INTERNAL_SERVER_ERROR);
             }
