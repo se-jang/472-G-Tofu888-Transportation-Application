@@ -1,14 +1,17 @@
 package ku.cs.transport_application.controller;
 
+import jakarta.validation.Valid;
 import ku.cs.transport_application.common.OrderStatus;
 import ku.cs.transport_application.common.UserRole;
 import ku.cs.transport_application.entity.User;
+import ku.cs.transport_application.request.EditProfileRequest;
 import ku.cs.transport_application.service.FileService;
 import ku.cs.transport_application.service.OrderService;
 import ku.cs.transport_application.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -45,23 +48,26 @@ public class UserController {
 
     @PutMapping("/users/update-profile/{userId}")
     public ResponseEntity<?> updateUserProfile(@PathVariable("userId") UUID userId,
-                                               @RequestParam(value = "profilePicture", required = false) MultipartFile profilePicture,
-                                               @RequestParam("name") String name,
-                                               @RequestParam("email") String email,
-                                               @RequestParam("phoneNumber") String phoneNumber) {
-        User record = userService.findById(userId);
-        record.setName(name);
-        record.setEmail(email);
-        record.setPhoneNumber(phoneNumber);
-        userService.setUser(record);
+                                               @Valid @RequestBody EditProfileRequest editProfileRequest,
+                                               BindingResult result) {
+        if (result.hasErrors()) {
+            return new ResponseEntity<>(result.getAllErrors(), HttpStatus.BAD_REQUEST);
+        }
 
-        if (profilePicture != null) {
+        User record = userService.findById(userId);
+        record.setName(editProfileRequest.getName());
+        record.setEmail(editProfileRequest.getEmail());
+        record.setPhoneNumber(editProfileRequest.getPhone());
+
+        if (editProfileRequest.getProfilePicture() != null) {
             try {
-                fileService.uploadProfilePicture(userId, profilePicture, record.getRole() == UserRole.USER ? UserRole.ADMIN : UserRole.USER);
+                fileService.uploadProfilePicture(userId, editProfileRequest.getProfilePicture() , record.getRole() == UserRole.USER ? UserRole.ADMIN : UserRole.USER);
             } catch (IOException e) {
                 return new ResponseEntity<>(Map.of("error", "Failed to upload profile picture"), HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
+
+        userService.setUser(record);
 
         return ResponseEntity.ok(record);
     }
