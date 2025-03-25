@@ -26,13 +26,13 @@ import java.util.UUID;
 public class FileService {
 
     @Autowired
-    OrderRepository orderRepository;
+    private OrderRepository orderRepository;
 
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
 
     @Autowired
-    TransportationWorkerRepository transportationWorkerRepository;
+    private TransportationWorkerRepository transportationWorkerRepository;
 
     public void uploadFile(UUID orderID, MultipartFile file) throws IOException {
         String uploadDir = "src" + File.separator + "main" + File.separator + "resources" + File.separator + "static" + File.separator + "images" + File.separator + "uploads";
@@ -141,7 +141,7 @@ public class FileService {
         }
     }
 
-    private void deleteFileIfExists(String filePath) {
+    public void deleteFileIfExists(String filePath) {
         File file = new File(filePath);
         if (file.exists() && file.isFile()) {
             if (!file.delete()) {

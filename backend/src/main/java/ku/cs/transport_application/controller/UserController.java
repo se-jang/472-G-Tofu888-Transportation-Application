@@ -67,6 +67,13 @@ public class UserController {
         record.setPhoneNumber(editProfileRequest.getPhoneNumber());
 
         if (profilePicture != null) {
+            String contentType = profilePicture.getContentType();
+            long fileSize = profilePicture.getSize();
+
+            if (!(contentType.equals("image/jpeg") || contentType.equals("image/png")) || fileSize > 5 * 1024 * 1024) {
+                return ResponseEntity.badRequest().body("Invalid file type or size exceeds 5MB limit");
+            }
+
             try {
                 fileService.uploadProfilePicture(userId, profilePicture, record.getRole() == UserRole.USER ? UserRole.ADMIN : UserRole.USER);
             } catch (IOException e) {
