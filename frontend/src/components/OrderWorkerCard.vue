@@ -6,18 +6,48 @@
     <p class="due-date">Date: {{ formattedDate(date) }}</p>
     <div class="button-group">
       <button class="details-button" @click="viewDetails">Details</button>
-      <button class="on-going-button" v-if="status === 'ONGOING' && isOnGoingClicked === false" @click="OnGoing">On Going</button>
-      <button class="success-button" v-if="status === 'ONGOING' && isOnGoingClicked" @click="Success">Success</button>
-      <input type="file" id="fileInput" style="display:none" @change="handleFileSelect" />
-      <button type="button" v-if="status === 'DELIVERED' || status === 'UPLOADED'" @click="triggerFileInput">Select File</button>
+      <!-- <button
+        class="on-going-button"
+        v-if="status === 'ONGOING' && isOnGoingClicked === false"
+        @click="OnGoing"
+      >
+        On Going
+      </button> -->
+      <button
+        class="success-button"
+        v-if="status === 'ONGOING' && !isOnGoingClicked"
+        @click="Success"
+      >
+        Success
+      </button>
+      <input
+        type="file"
+        id="fileInput"
+        style="display: none"
+        @change="handleFileSelect"
+      />
+      <button
+        type="button"
+        v-if="status === 'DELIVERED' || status === 'UPLOADED'"
+        @click="triggerFileInput"
+      >
+        Select File
+      </button>
       <span v-if="selectedFile">Selected File: {{ selectedFile.name }}</span>
-      <button type="button" v-if="status === 'DELIVERED' || status === 'UPLOADED'" @click="uploadFile" :disabled="!selectedFile">Upload</button>
+      <button
+        type="button"
+        v-if="status === 'DELIVERED' || status === 'UPLOADED'"
+        @click="uploadFile"
+        :disabled="!selectedFile"
+      >
+        Upload
+      </button>
     </div>
   </div>
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapGetters } from "vuex";
 import dayjs from "dayjs";
 export default {
   name: "OrderWorkerCard",
@@ -46,7 +76,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(['id']),
+    ...mapGetters(["id"]),
     statusClass() {
       switch (this.status) {
         case "ONGOING":
@@ -59,11 +89,10 @@ export default {
           return "";
       }
     },
-    
-  },  
+  },
   methods: {
     triggerFileInput() {
-      document.getElementById('fileInput').click();
+      document.getElementById("fileInput").click();
     },
     handleFileSelect(event) {
       this.selectedFile = event.target.files[0];
@@ -73,129 +102,138 @@ export default {
         alert("Please select a file to upload.");
         return;
       }
-      
+
       const formData = new FormData();
-      formData.append("orderId", 
+      formData.append(
+        "orderId",
         new Blob([JSON.stringify(this.orderId)], {
-                type: 'application/json',
-            })
-        );
+          type: "application/json",
+        })
+      );
       formData.append("file", this.selectedFile);
 
-      fetch('http://localhost:8080/upload', {
-        method: 'POST',
-        body: formData
+      fetch("http://localhost:8080/upload", {
+        method: "POST",
+        body: formData,
       })
-      .then(response => response.json())
-      .then(data => {
-        console.log('File uploaded successfully:', data);
-        alert(data.message || 'File uploaded successfully');
-        this.selectedFile = null;
-      })
-      .catch(error => {
-        console.error('Error uploading file:', error);
-        alert('Error uploading file');
-      });
+        .then((response) => response.json())
+        .then((data) => {
+          console.log("File uploaded successfully:", data);
+          alert(data.message || "File uploaded successfully");
+          this.selectedFile = null;
+        })
+        .catch((error) => {
+          console.error("Error uploading file:", error);
+          alert("Error uploading file");
+        });
 
       const status = "UPLOADED";
-      fetch(`http://localhost:8080/orders/order-detail/${this.orderId}/change-status`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: new URLSearchParams({
-          orderId: this.orderId,
-          status: status
+      fetch(
+        `http://localhost:8080/orders/order-detail/${this.orderId}/change-status`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: new URLSearchParams({
+            orderId: this.orderId,
+            status: status,
+          }),
+        }
+      )
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(data.message);
+          alert(data.message || "Order status updated successfully");
+          this.$router.go(0);
         })
-      })
-      .then(response => response.json())
-      .then(data => {
-        console.log(data.message);
-        alert(data.message || 'Order status updated successfully');
-        this.$router.go(0);
-      })
-      .catch(error => {
-        console.error('Error updating order status:', error);
-        alert('Error updating order status');
-      });
+        .catch((error) => {
+          console.error("Error updating order status:", error);
+          alert("Error updating order status");
+        });
     },
 
     formattedDate() {
-      return dayjs(this.date).format('DD/MM/YYYY HH:mm:ss');
+      return dayjs(this.date).format("DD/MM/YYYY HH:mm:ss");
     },
     viewDetails() {
       console.log(`Viewing details for order ID: ${this.orderId}`);
-      this.$router.push({ name: 'order-detail', params: { orderId: this.orderId } });
+      this.$router.push({
+        name: "order-detail",
+        params: { orderId: this.orderId },
+      });
     },
     OnGoing() {
-    const orderId = this.orderId;
-    console.log("order: ", orderId);
-    const workerId = this.id;
-    console.log("worker: ", workerId);
-    const status = "ONGOING";
-    const workerStatus = "ONGOING";
+      const orderId = this.orderId;
+      console.log("order: ", orderId);
+      const workerId = this.id;
+      console.log("worker: ", workerId);
+      const status = "ONGOING";
+      const workerStatus = "ONGOING";
 
-    fetch('http://localhost:8080/change-order-worker-status', {
-        method: 'POST',
+      fetch("http://localhost:8080/change-order-worker-status", {
+        method: "POST",
         headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
+          "Content-Type": "application/x-www-form-urlencoded",
         },
         body: new URLSearchParams({
+          orderId: orderId,
+          workerId: workerId,
+          status: status,
+          workerStatus: workerStatus,
+        }),
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Network response was not ok");
+          }
+          return response.json();
+        })
+        .then((data) => {
+          console.log(data.message);
+          this.isOnGoingClicked = true;
+          alert(data.message || "Order status updated successfully");
+        })
+        .catch((error) => {
+          console.error("Error updating order status:", error);
+          alert("Error updating order status");
+        });
+    },
+    Success() {
+      const orderId = this.orderId;
+      console.log("order: ", orderId);
+      const status = "DELIVERED";
+
+      fetch(
+        `http://localhost:8080/orders/order-detail/${orderId}/change-status`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: new URLSearchParams({
             orderId: orderId,
-            workerId: workerId,
             status: status,
-            workerStatus: workerStatus
-        })
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
+          }),
         }
-        return response.json();
-    })
-    .then(data => {
-        console.log(data.message);
-        this.isOnGoingClicked = true;
-        alert(data.message || 'Order status updated successfully');
-    })
-    .catch(error => {
-        console.error('Error updating order status:', error);
-        alert('Error updating order status');
-    });
-},
-  Success() {
-    const orderId = this.orderId;
-    console.log("order: ", orderId);
-    const status = "DELIVERED";
-
-    fetch(`http://localhost:8080/orders/order-detail/${orderId}/change-status`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: new URLSearchParams({
-            orderId: orderId,
-            status: status
+      )
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Network response was not ok");
+          }
+          return response.json();
         })
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        return response.json();
-    })
-    .then(data => {
-        console.log(data.message);
-        alert(data.message || 'Order status updated successfully');
-        this.$router.go(0);
-    })
-    .catch(error => {
-        console.error('Error updating order status:', error);
-        alert('Error updating order status');
-    });
-  }
-
-  }
+        .then((data) => {
+          console.log(data.message);
+          alert(data.message || "Order status updated successfully");
+          this.$router.go(0);
+        })
+        .catch((error) => {
+          console.error("Error updating order status:", error);
+          alert("Error updating order status");
+        });
+    },
+  },
 };
 </script>
 
@@ -215,7 +253,7 @@ export default {
 .customer-address {
   font-family: "Inter", sans-serif;
   margin: 0;
-  margin-bottom :10px;
+  margin-bottom: 10px;
 }
 
 .button-group {
@@ -255,16 +293,16 @@ export default {
 
 .status-ongoing {
   font-family: "Inter", sans-serif;
-  background-color: #FFA500;
+  background-color: #ffa500;
 }
 
 .status-delivered {
   font-family: "Inter", sans-serif;
-  background-color: #32CD32;
+  background-color: #32cd32;
 }
 
 .status-uploaded {
   font-family: "Inter", sans-serif;
-  background-color: #8A2BE2;
+  background-color: #8a2be2;
 }
 </style>

@@ -35,6 +35,10 @@ export default {
   computed: {
     statusClass() {
       switch (this.status) {
+        case "UNPAID":
+          return "status-unpaid";
+        case "PAID":
+          return "status-paid";
         case "UNCHECK":
           return "status-uncheck";
         case "CHECKED":
@@ -55,16 +59,22 @@ export default {
   methods: {
     viewDetails() {
       console.log(`Viewing details for order ID: ${this.orderId}`);
-      this.$router.push({ name: 'order-detail', params: { orderId: this.orderId } });
+      this.$router.push({
+        name: "order-detail",
+        params: { orderId: this.orderId },
+      });
     },
     formattedDate() {
-      return dayjs(this.date).format('DD/MM/YYYY HH:mm:ss');
+      return dayjs(this.date).format("DD/MM/YYYY HH:mm:ss");
     },
   },
 };
 </script>
 
 <style scoped>
+* {
+  font-family: "Inter", sans-serif;
+}
 .order-card {
   position: relative;
   background-color: white;
@@ -77,15 +87,13 @@ export default {
 .order-id,
 .due-date,
 .customer-name,
-.customer-address{
-  font-family: "Inter", sans-serif;
+.customer-address {
   margin: 0;
   margin-bottom: 10px;
 }
 
 .details-button {
   padding: 5px 10px;
-  font-family: "Inter", sans-serif;
   background-color: gray;
   color: white;
   border: none;
@@ -105,33 +113,35 @@ export default {
   border-radius: 5px;
 }
 
+.status-unpaid {
+  background-color: #e21a1a;
+}
+
+.status-paid {
+  background-color: #dce532;
+}
+
 .status-uncheck {
-  font-family: "Inter", sans-serif;
-  background-color: #D3D3D3;
+  background-color: #d3d3d3;
 }
 
 .status-checked {
-  font-family: "Inter", sans-serif;
-  background-color: #1E90FF;
+  background-color: #1e90ff;
 }
 
 .status-ongoing {
-  font-family: "Inter", sans-serif;
-  background-color: #FFA500;
+  background-color: #ffa500;
 }
 
 .status-delivered {
-  font-family: "Inter", sans-serif;
-  background-color: #32CD32;
+  background-color: #32cd32;
 }
 
 .status-uploaded {
-  font-family: "Inter", sans-serif;
-  background-color: #8A2BE2;
+  background-color: #8a2be2;
 }
 
 .status-completed {
-  font-family: "Inter", sans-serif;
   background-color: #00289e;
 }
 </style>

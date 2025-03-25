@@ -67,7 +67,7 @@ export default {
   methods: {
     async fetchOrders() {
       try {
-        const response = await axios.get(`http://localhost:8080/transportation-workers/${this.workerId}`);
+        const response = await axios.get(`http://localhost:8080/transportation-workers/${this.workerId}/orders`);
         this.orders = response.data;
       } catch (error) {
         console.error("Error fetching orders:", error);

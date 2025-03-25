@@ -3,18 +3,26 @@
     <Header></Header>
     <div class="main-container">
       <div class="order-detail-container" v-if="order">
+        <button class="delete-button" v-if="userRole === 'USER' && (order.status === 'UNPAID' || order.status === 'COMPLETED')" @click=deleteOrder>Delete</button>
+        <button class="edit-button" v-if="userRole === 'USER' && order.status === 'UNPAID'" @click=editOrder>Edit</button>
         <button class="back-button" @click="$router.back()">Back</button>
         <p class="order-id-text">Order ID: {{ this.$route.params.orderId }}</p>
         <div class="order-info-wrapper">
           <div class="order-info-box">
             <div class="order-info-left">
               <p><strong>Date:</strong> {{ formattedDate(order.date) }}</p>
-              <p><strong>Transportation Worker:</strong> {{ order.workerUsername || 'N/A' }}</p>
+              <p>
+                <strong>Transportation Worker:</strong>
+                {{ order.workerUsername || "N/A" }}
+              </p>
             </div>
             <div class="order-info-right">
               <p><strong>Status:</strong> {{ order.status }}</p>
               <p><strong>Customer Name:</strong> {{ order.customerName }}</p>
-              <p><strong>Customer Address:</strong> {{ order.customerAddress || 'N/A' }}</p>
+              <p>
+                <strong>Customer Address:</strong>
+                {{ order.customerAddress || "N/A" }}
+              </p>
             </div>
           </div>
         </div>
@@ -42,10 +50,32 @@
           </table>
         </div>
 
-        <button v-if="userRole === 'ADMIN' && order.status === 'UNCHECK'" @click="checked" class="checked-button">Checked</button>
-        <button v-if="userRole === 'ADMIN' && order.status === 'UPLOADED'" @click="clickComplete" class="checked-button">Complete</button>
-        <button v-if="userRole === 'ADMIN' && order.status === 'UPLOADED'" @click="showFileModal" class="file-pop">File</button>
-        <FileViewerModal :isVisible="isFileModalVisible" :fileUrl="fileUrl" @close="isFileModalVisible = false" />
+        <button
+          v-if="userRole === 'ADMIN' && order.status === 'UNCHECK'"
+          @click="checked"
+          class="checked-button"
+        >
+          Checked
+        </button>
+        <button
+          v-if="userRole === 'ADMIN' && order.status === 'UPLOADED'"
+          @click="clickComplete"
+          class="checked-button"
+        >
+          Complete
+        </button>
+        <button
+          v-if="userRole === 'ADMIN' && order.status === 'UPLOADED'"
+          @click="showFileModal"
+          class="file-pop"
+        >
+          File
+        </button>
+        <FileViewerModal
+          :isVisible="isFileModalVisible"
+          :fileUrl="fileUrl"
+          @close="isFileModalVisible = false"
+        />
       </div>
     </div>
   </div>
@@ -62,13 +92,13 @@ export default {
   name: "OrderDetail",
   components: {
     Header,
-    FileViewerModal
+    FileViewerModal,
   },
   data() {
     return {
       order: null,
       isFileModalVisible: false,
-      fileUrl: ""
+      fileUrl: "",
     };
   },
   computed: {
@@ -77,90 +107,121 @@ export default {
   methods: {
     async fetchOrderDetails() {
       try {
-          const response = await axios.get(`http://localhost:8080/orders/order-detail/${this.$route.params.orderId}`);
-          this.order = response.data;
-          console.log("Order data:", this.order);
+        const response = await axios.get(
+          `http://localhost:8080/orders/order-detail/${this.$route.params.orderId}`
+        );
+        this.order = response.data;
+        console.log("Order data:", this.order);
       } catch (error) {
-          console.error("Error fetching order details:", error);
+        console.error("Error fetching order details:", error);
       }
     },
-
     formattedDate(date) {
-      return dayjs(date).format('DD/MM/YYYY HH:mm:ss');
+      return dayjs(date).format("DD/MM/YYYY HH:mm:ss");
+    },
+    editOrder() {
+      const orderId = this.$route.params.orderId;
+      this.$router.push({
+        name: 'edit-order',
+        query: {orderDetails: JSON.stringify(this.order)}});
+    },
+    deleteOrder() {
+      const orderId = this.$route.params.orderId;
+      if (confirm("Do you want to delete this order?")) { // ยืนยันการลบ
+        axios
+          .delete(`http://localhost:8080/orders/${orderId}/delete`)
+          .then((response) => {
+            alert(response.data || "Order delete successfully");
+            this.$router.push({ name: "orders" }); // ย้ายไปหน้า orders หลังลบสำเร็จ
+          })
+          .catch((error) => {
+            console.error("Error deleting order:", error);
+            if (error.response && error.response.status === 403) {
+              alert("Order cannot be deleted due to invalid orders status");
+            } else {
+              alert("An error occurred while deleting the order");
+            }
+          });
+      }
     },
     checked() {
       const orderId = this.$route.params.orderId;
       console.log("order: ", orderId);
       const status = "CHECKED";
 
-      fetch(`http://localhost:8080/orders/order-detail/${orderId}/change-status`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: new URLSearchParams({
+      fetch(
+        `http://localhost:8080/orders/order-detail/${orderId}/change-status?staus=CHECKED`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: new URLSearchParams({
             orderId: orderId,
-            status: status
-        })
-      })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
+            status: status,
+          }),
         }
-        return response.json();
-    })
-    .then(data => {
-        console.log(data.message);
-        alert(data.message || 'Order status updated successfully');
-            this.$router.push({ name: 'orders' });
-    })
-    .catch(error => {
-        console.error('Error updating order status:', error);
-        alert('Error updating order status');
-    });
+      )
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Network response was not ok");
+          }
+          return response.json();
+        })
+        .then((data) => {
+          console.log(data.message);
+          alert(data.message || "Order status updated successfully");
+          this.$router.push({ name: "orders" });
+        })
+        .catch((error) => {
+          console.error("Error updating order status:", error);
+          alert("Error updating order status");
+        });
     },
     clickComplete() {
       const orderId = this.$route.params.orderId;
       console.log("order: ", orderId);
       const status = "COMPLETED";
 
-      fetch(`http://localhost:8080/orders/order-detail/${orderId}/change-status`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: new URLSearchParams({
+      fetch(
+        `http://localhost:8080/orders/order-detail/${orderId}/change-status`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: new URLSearchParams({
             orderId: orderId,
-            status: status
-        })
-      })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
+            status: status,
+          }),
         }
-        return response.json();
-    })
-    .then(data => {
-        console.log(data.message);
-        alert(data.message || 'Order status updated successfully');
-            this.$router.push({ name: 'orders' });
-    })
-    .catch(error => {
-        console.error('Error updating order status:', error);
-        alert('Error updating order status');
-    });
+      )
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Network response was not ok");
+          }
+          return response.json();
+        })
+        .then((data) => {
+          console.log(data.message);
+          alert(data.message || "Order status updated successfully");
+          this.$router.push({ name: "orders" });
+        })
+        .catch((error) => {
+          console.error("Error updating order status:", error);
+          alert("Error updating order status");
+        });
     },
     showFileModal() {
       this.fileUrl = `http://localhost:8080/orders/order-detail/${this.$route.params.orderId}/shipment-doc`;
       this.isFileModalVisible = true;
-    }
+    },
   },
   mounted() {
     this.fetchOrderDetails();
   },
 };
 </script>
-
 
 <style>
 :root {
@@ -218,10 +279,8 @@ export default {
   margin-top: 60px;
 }
 
-.back-button {
+.back-button{
   position: absolute;
-  top: 20px;
-  right: 20px;
   background-color: var(--button-bg-color);
   color: var(--button-text-color);
   border: none;
@@ -229,8 +288,30 @@ export default {
   border-radius: 5px;
   cursor: pointer;
   width: auto;
-  margin-bottom: 20px;
-  
+}
+.edit-button {
+  position: absolute;
+  background-color: var(--button-bg-color);
+  color: var(--button-text-color);
+  border: none;
+  top: 40px;
+  right: 100px;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  width: auto;
+}
+.delete-button {
+  position: absolute;
+  background-color: var(--button-bg-color);
+  color: var(--button-text-color);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  width: auto;
+  bottom: 20px;
+  right: 20px;
 }
 
 .checked-button {

@@ -53,16 +53,17 @@ export default {
 
             console.log("User role:", userRole);
             console.log("Username:", username);
-            console.log("worker: ", data.id)
+            console.log("worker: ", data.id);
 
             this.updateUserRole(userRole);
             this.updateUsername(username);
             this.updateId(data.id);
 
-
             this.$router.push("/main");
           } else {
-            alert("Login failed: Role, username, or token is missing in the response.");
+            alert(
+              "Login failed: Role, username, or token is missing in the response."
+            );
           }
         } else {
           const error = await response.text();

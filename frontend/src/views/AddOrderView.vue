@@ -7,7 +7,7 @@
           <h2 class="order-title">Add Order</h2>
           <button class="back" @click="goBack">Back</button>
         </div>
-        <button v-if="orders.length > 0" @click="assignWorker">Assign Worker</button>
+        <button v-if="orders.length > 0" @click="assignWorker"></button>
 
         <div class="order-list">
           <AddOrderWorkerCard
@@ -30,7 +30,7 @@
 import axios from "axios";
 import Header from "../components/Header.vue";
 import AddOrderWorkerCard from "@/components/AddOrderWorkerCard.vue";
-import {mapGetters} from "vuex";
+import { mapGetters } from "vuex";
 
 export default {
   components: {
@@ -62,29 +62,38 @@ export default {
           `http://localhost:8080/transportation-workers/worker/worker-detail/${this.selectedWorkerId}/add-order`,
           null,
           {
-            params: { workerId: this.selectedWorkerId, orderId: this.selectedOrderId },
+            params: {
+              workerId: this.selectedWorkerId,
+              orderId: this.selectedOrderId,
+            },
           }
         );
         console.log(response.data.message);
         const statusUpdateResponse = await fetch(
-            `http://localhost:8080/orders/order-detail/${this.selectedOrderId}/change-status`,
-            {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-              },
-              body: new URLSearchParams({
-                orderId: this.selectedOrderId,
-                status: status
-              }),
-            }
+          `http://localhost:8080/orders/order-detail/${this.selectedOrderId}/change-status`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: new URLSearchParams({
+              orderId: this.selectedOrderId,
+              status: status,
+            }),
+          }
         );
 
         const statusUpdateData = await statusUpdateResponse.json();
         console.log(statusUpdateData.message);
-        alert(statusUpdateData.message || 'Order status updated to ONGOING successfully.');
+        alert(
+          statusUpdateData.message ||
+            "Order status updated to ONGOING successfully."
+        );
 
-        this.$router.push({ name: 'worker-detail', params: { workerId: this.selectedWorkerId } });
+        this.$router.push({
+          name: "worker-detail",
+          params: { workerId: this.selectedWorkerId },
+        });
       } catch (error) {
         console.error("Failed to assign worker:", error);
       }
@@ -98,7 +107,9 @@ export default {
     },
     async fetchOrders() {
       try {
-        const response = await axios.get("http://localhost:8080/orders/check-orders");
+        const response = await axios.get(
+          "http://localhost:8080/orders/check-orders"
+        );
         this.orders = response.data;
         console.log("orders:", this.orders);
       } catch (error) {
@@ -111,7 +122,6 @@ export default {
   },
 };
 </script>
-
 
 <style scoped>
 :root {
@@ -158,7 +168,7 @@ export default {
   margin-bottom: 20px;
 }
 
-.back{
+.back {
   background-color: black;
   color: white;
   border: none;

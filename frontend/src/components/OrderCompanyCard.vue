@@ -1,139 +1,176 @@
 <template>
-  <div class="order-card">
-    <div class="status-indicator" :class="statusClass">{{ status }}</div>
-    <h2 class="order-id">Order ID: {{ orderId }}</h2>
-    <p class="customer-name">Customer Name: {{ customerName }}</p>
-    <p class="due-date">Date: {{ formattedDate(date) }}</p>
-    <button class="details-button" @click="viewDetails">Details</button>
-    <button v-if="status === 'delivered'" class="bill-button">Bill</button>
-  </div>
+    <div class="order-card">
+        <div class="status-indicator" :class="statusClass">{{ status }}</div>
+        <h2 class="order-id">Order ID: {{ orderId }}</h2>
+        <p class="customer-name">Customer Name: {{ customerName }}</p>
+        <p class="due-date">Date: {{ formattedDate(date) }}</p>
+        <p>Total: {{ total }}</p>
+        <button class="details-button" @click="viewDetails">Details</button>
+        <button class="pay-button" v-if="status === `UNPAID`" @click="payment">
+            Pay
+        </button>
+        <button
+            v-if="status === 'COMPLETED'"
+            class="bill-button"
+            @click="goToReceipt"
+        >
+            Bill
+        </button>
+    </div>
 </template>
 
 <script>
-import dayjs from 'dayjs';
+import dayjs from 'dayjs'
+import router from '@/router'
 
 export default {
-  name: "OrderCompanyCard",
-  props: {
-    status: {
-      type: String,
-      default: "checked",
+    name: 'OrderCompanyCard',
+    props: {
+        status: {
+            type: String,
+            default: 'checked',
+        },
+        orderId: {
+            type: String,
+            required: true,
+        },
+        date: {
+            type: String,
+            required: true,
+        },
+        customerName: {
+            type: String,
+            required: true,
+        },
+        total: {
+            type: Number,
+            required: true,
+        },
+        paymentLink: {
+            type: String,
+            required: true,
+        },
     },
-    orderId: {
-      type: String,
-      required: true,
+    methods: {
+        viewDetails() {
+            console.log(`Viewing details for order ID: ${this.orderId}`)
+            this.$router.push({
+                name: 'order-detail',
+                params: { orderId: this.orderId },
+            })
+        },
+        formattedDate() {
+            return dayjs(this.date).format('DD/MM/YYYY HH:mm:ss')
+        },
+        payment() {
+            window.open(this.paymentLink)
+        },
+        goToReceipt() {
+            router.push(`/receipt/${this.orderId}`)
+        },
     },
-    date: {
-      type: String,
-      required: true,
+    computed: {
+        statusClass() {
+            switch (this.status) {
+                case 'UNPAID':
+                    return 'status-unpaid'
+                case 'UNCHECK':
+                    return 'status-uncheck'
+                case 'CHECKED':
+                    return 'status-checked'
+                case 'ONGOING':
+                    return 'status-ongoing'
+                case 'DELIVERED':
+                    return 'status-delivered'
+                case 'UPLOADED':
+                    return 'status-uploaded'
+                case 'COMPLETED':
+                    return 'status-completed'
+                default:
+                    return ''
+            }
+        },
     },
-    customerName: {
-      type: String,
-      required: true,
-    },
-  },
-  methods: {
-    viewDetails() {
-      console.log(`Viewing details for order ID: ${this.orderId}`);
-      this.$router.push({ name: 'order-detail', params: { orderId: this.orderId } });
-    },
-    formattedDate() {
-      return dayjs(this.date).format('DD/MM/YYYY HH:mm:ss');
-    },
-  },
-  computed: {
-    statusClass() {
-      switch (this.status) {
-        case "UNCHECK":
-          return "status-uncheck";
-        case "CHECKED":
-          return "status-checked";
-        case "ONGOING":
-          return "status-ongoing";
-        case "DELIVERED":
-          return "status-delivered";
-        case "UPLOADED":
-          return "status-uploaded";
-        case "COMPLETED":
-          return "status-completed";
-        default:
-          return "";
-      }
-    },
-  },
-};
+}
 </script>
 
 <style scoped>
 .order-card {
-  position: relative;
-  background-color: white;
-  padding: 20px;
-  border-radius: 5px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  margin-top: 15px;
+    font-family: 'Inter', sans-serif;
+    position: relative;
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-top: 15px;
 }
 
 .order-id,
 .due-date,
 .customer-name,
 .customer-address {
-  font-family: "Inter", sans-serif;
-  margin: 0;
-  margin-bottom :10px;
+    margin: 0;
+    margin-bottom: 10px;
 }
 
 .details-button,
 .bill-button {
-  padding: 5px 10px;
-  font-family: "Inter", sans-serif;
-  background-color: gray;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  width: auto;
-  margin-right: 10px;
+    padding: 5px 10px;
+    background-color: gray;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: auto;
+    margin-right: 10px;
+}
+
+.pay-button {
+    padding: 5px 2rem;
+    background-color: rgb(103, 181, 112);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: auto;
 }
 
 .status-indicator {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  padding: 5px 10px;
-  font-size: 14px;
-  font-weight: bold;
-  color: white;
-  border-radius: 5px;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 5px 10px;
+    font-size: 14px;
+    font-weight: bold;
+    color: white;
+    border-radius: 5px;
+}
+
+.status-unpaid {
+    background-color: rgb(216, 78, 78);
 }
 
 .status-uncheck {
-  font-family: "Inter", sans-serif;
-  background-color: #D3D3D3;
+    background-color: #d3d3d3;
 }
 
 .status-checked {
-  font-family: "Inter", sans-serif;
-  background-color: #1E90FF;
+    background-color: #1e90ff;
 }
 
 .status-ongoing {
-  font-family: "Inter", sans-serif;
-  background-color: #FFA500;
+    background-color: #ffa500;
 }
 
 .status-delivered {
-  font-family: "Inter", sans-serif;
-  background-color: #32CD32;
+    background-color: #32cd32;
 }
 
 .status-uploaded {
-  font-family: "Inter", sans-serif;
-  background-color: #8A2BE2;
+    background-color: #8a2be2;
 }
 
 .status-completed {
-  font-family: "Inter", sans-serif;
-  background-color: #00289e;
+    background-color: #00289e;
 }
 </style>

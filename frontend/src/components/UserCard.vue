@@ -1,10 +1,13 @@
 <template>
-    <div class="user-card">
-      <h2 class="user-id">User ID: {{ userId }}</h2>
-      <p class="user-name">Name: {{ name }}</p>
-      <button class="details-button" @click="goDetail">Details</button>
-    </div>
-  </template>
+  <div class="user-card" v-if="userId && name">
+    <h2 class="user-id">User ID: {{ userId }}</h2>
+    <p class="user-name">Name: {{ name }}</p>
+    <button class="details-button" @click="goDetail">Details</button>
+  </div>
+  <div v-else>
+    <p>Invalid User Data</p>
+  </div>
+</template>
   
   <script>
   export default {
@@ -13,10 +16,12 @@
       userId: {
         type: String,
         required: true,
+        default: 'Unknown'
       },
       name: {
         type: String,
         required: true,
+        default: 'Unknown'
       },
     },
     methods: {
