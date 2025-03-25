@@ -20,6 +20,14 @@
 - As a customer, I want to be able to select a payment service so that I can use my preferred provider.
 - As a customer, I want to be able to pay so that I can use my preferred payment method.
 
+### ยศวัจน์ บวรศรีธนนนท์ 6510450879 หมู่ 200 ปี 3
+
+@FrostBitzX Feat: Receipt
+
+- As a customer, I want to see and show my receipt correctly.
+- As an admin, I want to be able to view any customer's receipt.
+- As a customer, I want to be able to view my order receipt so that I can check receipt details.
+
 ---
 
 ## Installation (Manual)
