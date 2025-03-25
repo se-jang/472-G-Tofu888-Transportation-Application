@@ -35,6 +35,14 @@
 - As a customer, I want to be able to delete my order so that I can remove an order I no longer need.
 - As a customer, I want to be able to edit my order so that I can change my order details.
 - As an user, I want to be able to search for orders by customer's name so that I can view specific user orders.
+
+### ภัควัฒน์ ปานกลาง 6510450763 หมู่ 200 ปี 3
+
+@JIMpk2w Feat: Account
+
+- As an admin, I want to be able to delete a customer's account so that I can remove inactive users.
+- As a customer, I want to add a profile picture so that I can see an image of myself on my profile.
+- As a customer, I want to be able to edit my profile so that I can update my personal information.
 ---
 
 ## Installation (Manual)
