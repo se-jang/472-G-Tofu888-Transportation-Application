@@ -4,11 +4,22 @@ test.describe('Search functionality', () => {
   let page;
 
   test.beforeEach(async ({ page }) => {
-    console.log("Opening page...");
-    await page.goto('http://localhost:5173/orders');
-    await page.waitForLoadState('domcontentloaded'); // รอให้ DOM โหลดก่อน
-  });
+    console.log("Opening login page...");
+    await page.goto('http://localhost:5173/login');
+  
+    // กรอก username และ password
+    await page.fill('input#username', 'user'); // 🔹 แก้เป็น username จริง
+    await page.fill('input#password', '12345678'); // 🔹 แก้เป็นรหัสผ่านจริง
+    await page.click('button[type="submit"]');
+  
+    // ✅ รอให้หน้าโหลดหลังล็อกอินสำเร็จ
+    await page.waitForNavigation({ waitUntil: 'networkidle' });
+  
+    console.log("Login successful, navigating to orders page...");
+    await page.goto('http://localhost:5173/orders'); // ไปหน้าที่ต้องการเทส
+  });  
 
+  //Test
   test('filters orders based on customer name', async ({ page }) => {
     await page.waitForSelector('input[placeholder="Search..."]', { state: 'attached' });
     // ตั้งค่า searchQuery เป็น 'John'
