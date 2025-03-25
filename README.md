@@ -28,6 +28,13 @@
 - As an admin, I want to be able to view any customer's receipt.
 - As a customer, I want to be able to view my order receipt so that I can check receipt details.
 
+### ปริยานุช มั่งคั่ง 6510450607 หมู่ 200 ปี 3
+
+@FrostBitzX Feat: Order
+
+- As a customer, I want to be able to delete my order so that I can remove an order I no longer need.
+- As a customer, I want to be able to edit my order so that I can change my order details.
+- As an user, I want to be able to search for orders by customer's name so that I can view specific user orders.
 ---
 
 ## Installation (Manual)
