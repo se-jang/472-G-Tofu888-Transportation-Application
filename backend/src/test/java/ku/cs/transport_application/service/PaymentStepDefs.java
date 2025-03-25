@@ -1,4 +1,4 @@
-package ku.cs.transport_application.service.payment;
+package ku.cs.transport_application.service;
 
 import com.stripe.exception.StripeException;
 import io.cucumber.java.Before;
@@ -10,6 +10,9 @@ import static org.mockito.Mockito.*;
 
 import ku.cs.transport_application.entity.Order;
 import ku.cs.transport_application.DTO.PaymentResponse;
+import ku.cs.transport_application.service.payment.CreditCardPaymentService;
+import ku.cs.transport_application.service.payment.PromptPayPaymentService;
+
 import java.util.UUID;
 
 public class PaymentStepDefs {
