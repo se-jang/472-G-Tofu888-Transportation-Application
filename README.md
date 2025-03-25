@@ -30,6 +30,9 @@
 ```plaintext
 JWT_SECRET=c2b000d555fe251e11a30a7ae438b65a6a51c9989f42997b361fd9c9bd543757d167ff92a3961ff4ca3c25c2122e94a3e53db62a45ffd198846a7441f57a68e82f1ca43e218a458ade6d2e979dd609198ebc0b75d96f87c60e3213a22321479a9cbb304bbf04ed0b49af8c04d5cef5aef143530b6867cb7627d965bc53979d253fa8686b0f249c29cdd447f443d896a2a939740ea9a376feada51a481f825cc65ebf25cde6e4ce308363c139dd1a6367249cf8a242882396792770ed98760970c12768eefa787c6f99c5fb446bb6c187a274310d8580a6db8e5120c420800e5717417047f6fd5a1fdf6529b62dfd6a262a5dca4b617d987c00f853b089084637
 STRIPE_TEST_KEY=sk_test_51Qo5Kd4GNo7fC8bY88uFMlUtHNOMPSPpFGubObIeqydMgCTafI98hX1sWOCnidWZJAC4DwIJeYG2ZI1dqu9VTSEE00G5MxXsFE
+SPRING_MAIL_PASSWORD='iuzq kgqr uilf wcmn'
+SPRING_MAIL_USERNAME=transportapplicationjab@gmail.com
+SPRING_EMAIL_SENDER_HOST=smtp.gmail.com
 ```
 
 ### 2. การตั้งค่าการส่งอีเมล
@@ -37,9 +40,9 @@ STRIPE_TEST_KEY=sk_test_51Qo5Kd4GNo7fC8bY88uFMlUtHNOMPSPpFGubObIeqydMgCTafI98hX1
 สร้างไฟล์ application-secret.properties ในโฟลเดอร์ src/main/resources ด้วยเนื้อหาดังนี้:
 
 ```plaintext
-spring.email.sender.host=smtp.gmail.com
-spring.mail.username=transportapplicationjab@gmail.com
-spring.mail.password=iuzq kgqr uilf wcmn
+spring.email.sender.host=${SPRING_EMAIL_SENDER_HOST}
+spring.mail.username=${SPRING_MAIL_USERNAME}
+spring.mail.password=${SPRING_MAIL_PASSWORD}
 spring.mail.debug=true
 
 stripe.api.key.test=${STRIPE_TEST_KEY}

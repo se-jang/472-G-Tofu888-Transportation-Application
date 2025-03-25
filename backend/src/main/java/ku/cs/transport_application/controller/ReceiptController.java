@@ -1,9 +1,5 @@
 package ku.cs.transport_application.controller;
 
-import ku.cs.transport_application.common.UserRole;
-import ku.cs.transport_application.entity.Receipt;
-import ku.cs.transport_application.entity.User;
-import ku.cs.transport_application.repository.ReceiptRepository;
 import ku.cs.transport_application.response.ReceiptResponse;
 import ku.cs.transport_application.service.ReceiptService;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -7,7 +7,7 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 .env
-application-secret.properties
+# application-secret.properties (safe ใช้ env แล้ว)
 
 ### STS ###
 .apt_generated
